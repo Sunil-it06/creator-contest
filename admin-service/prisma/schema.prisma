@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WinnerStatus {
+  ACTIVE
+  REMOVED
+}
+
+enum KycStatus {
+  NOT_REQUESTED
+  PENDING
+  PASSED
+  FAILED
+}
+
+model Admin {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Winner {
+  id        String @id @default(uuid())
+  userId    String
+  slotKey   String
+  prizeTier String
+  prizeName String
+
+  status    WinnerStatus @default(ACTIVE)
+  kycStatus KycStatus    @default(NOT_REQUESTED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kycRequests KycRequest[]
+
+  @@index([userId])
+  @@index([slotKey])
+  @@index([prizeTier])
+  @@index([status])
+  @@index([kycStatus])
+}
+
+model KycRequest {
+  id          String    @id @default(uuid())
+  winnerId    String
+  status      KycStatus @default(PENDING)
+  requestedAt DateTime  @default(now())
+  reviewedAt  DateTime?
+  remarks     String?
+
+  winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
+
+  @@index([winnerId])
+  @@index([status])
+}

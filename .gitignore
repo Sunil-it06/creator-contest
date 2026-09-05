@@ -1,0 +1,75 @@
+# =========================
+# Node.js
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Keep example environment files
+!.env.example
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Coverage / Tests
+# =========================
+coverage/
+.nyc_output/
+
+# =========================
+# Frontend
+# =========================
+frontend/dist/
+frontend/.vite/
+
+# =========================
+# Uploaded media
+# =========================
+user-service/uploads/*
+!user-service/uploads/.gitkeep
+
+# =========================
+# Prisma
+# =========================
+# Generated Prisma client
+admin-service/src/generated/
+
+# Prisma migrations should NOT be ignored
+# They are required for submission.
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# IDE / Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.bak

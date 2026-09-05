@@ -1,0 +1,74 @@
+services:
+
+  mongodb:
+    image: mongo:8
+    container_name: creator-contest-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  postgres:
+    image: postgres:17
+    container_name: creator-contest-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: creator_contest_admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  user-service:
+    build:
+      context: ./user-service
+    container_name: creator-contest-user-service
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      PORT: 5000
+      MONGO_URI: "mongodb://mongodb:27017/creator_contest"
+      JWT_SECRET: "change_this_user_jwt_secret"
+      INTERNAL_API_KEY: "my_internal_secret_key"
+    ports:
+      - "5000:5000"
+    volumes:
+      - user_uploads:/app/uploads
+
+  admin-service:
+    build:
+      context: ./admin-service
+    container_name: creator-contest-admin-service
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - user-service
+    environment:
+      PORT: 6001
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/creator_contest_admin?schema=public"
+      JWT_SECRET: "change_this_admin_jwt_secret"
+      USER_SERVICE_URL: "http://user-service:5000"
+      USER_SERVICE_INTERNAL_API_KEY: "my_internal_secret_key"
+      CONTEST_START_DATE: "2026-09-01T00:00:00.000Z"
+    ports:
+      - "6001:6001"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: creator-contest-frontend
+    restart: unless-stopped
+    depends_on:
+      - user-service
+      - admin-service
+    ports:
+      - "5173:5173"
+
+volumes:
+  mongodb_data:
+  postgres_data:
+  user_uploads:
